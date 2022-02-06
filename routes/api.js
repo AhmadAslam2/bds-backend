@@ -8,7 +8,6 @@ const authGuard = require("../helpers/auth-guard");
 const assignToken = require("../helpers/jwt-helper");
 const DonationRequest = require("../models/DonationRequest");
 
-//Image upload if needed
 const options = multer.diskStorage({
   destination: "./public/data/uploads/",
   filename: function (req, file, cb) {
