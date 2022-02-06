@@ -12,7 +12,7 @@ const app = express();
 app.use("/static", express.static(path.join(__dirname, "public/data/uploads")));
 app.use(express.static(path.join(__dirname, "public/data/uploads")));
 
-const connection = mongoose.connect("mongodb+srv://admin:admin@cluster0.oagkg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
+const connection = mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
