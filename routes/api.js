@@ -68,6 +68,7 @@ router.post("/signup", async function (req, res) {
       token: token,
     });
   } catch (error) {
+    console.log(error)
     if (error.name === 'MongoError' && error.code === 11000) {
       return res.status(500).send({
         message: "Email already exists"
