@@ -92,7 +92,13 @@ router.get("/me", authGuard, async function (req, res) {
 });
 
 router.get("/donationRequests", async function (req, res, next) {
-  const donationRequests = await DonationRequest.find();
+  console.log(req)
+  const bloodType = req?.query?.bloodType || "all";
+  const query = {}
+  if (bloodType !== "all") {
+    query.bloodType = bloodType
+  }
+  const donationRequests = await DonationRequest.find(query)
   return res.status(200).send({
     donationRequests,
   });
@@ -128,10 +134,10 @@ router.put(
         })
       }
       await DonationRequest.findByIdAndUpdate(requestId,
-        { $inc: { amountFilled: +1 } }
+        { $inc: { amountFilled: +1 }, status: "PENDING" }
       );
       await User.findByIdAndUpdate(userId, {
-        $push: { donations: _donationRuquest._id }
+        $push: { donations: _donationRuquest._id, }
       },
         { new: true, });
       return res.status(200).send({
@@ -150,23 +156,53 @@ router.put(
 router.get("/my/donationRequests", authGuard, async function (req, res) {
   const { _id } = req.user;
   const donationRequests = await DonationRequest.find({
-    userId: _id,
+    userId: _id
   });
   return res.status(200).send({
     donationRequests,
   });
 });
 
+/* GET donation request for the loggedin users. */
+router.get("/donationRequest/:id", authGuard, async function (req, res) {
+  const { id } = req.params;
+  const donation = await DonationRequest.findOne({
+    _id: id
+  });
+  return res.status(200).send({
+    donation,
+  });
+});
+
 /* GET donation for the loggedin user. */
 router.get("/my/donations", authGuard, async function (req, res) {
-  const { donations: donationIds } = req.user;
+  const user = await User.findOne({
+    _id: req?.user?._id
+  }).lean()
+  if (!user) {
+    return res?.status(401).send({
+      message: "Invalid user or token"
+    })
+  }
+  console.log(user)
   const donations = await DonationRequest.find({
-    userId: {
-      $in: [...donationIds]
+    _id: {
+      $in: [...user?.donations]
     },
   });
   return res.status(200).send({
     donations,
+  });
+});
+
+
+router.get("/user/:id", async function (req, res) {
+  const { id } = req.params;
+  const user = await User.findOne({
+    _id: id
+  });
+  return res.status(200).send({
+    user,
   });
 });
 
