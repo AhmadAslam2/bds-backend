@@ -195,7 +195,6 @@ router.get("/my/donations", authGuard, async function (req, res) {
   });
 });
 
-
 router.get("/user/:id", async function (req, res) {
   const { id } = req.params;
   const user = await User.findOne({
@@ -205,5 +204,15 @@ router.get("/user/:id", async function (req, res) {
     user,
   });
 });
+
+/* delete donation request for the loggedin users. */
+router.delete("/donationRequest/:id", authGuard, async function (req, res) {
+  const { id } = req.params;
+  const donation = await DonationRequest.findByIdAndDelete(id);
+  return res.status(200).send({
+    message: "Deleted successfully",
+  });
+});
+
 
 module.exports = router;
